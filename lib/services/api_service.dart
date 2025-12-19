@@ -12,6 +12,7 @@ class Api {
       .replace(queryParameters: {'subdomain': 'bigboxdelivery'});
     var response = await http.get(uri);
     if (response.statusCode == 200) {
+      print('Requisição bem sucedida!');
       responseJson = json.decode(const Utf8Decoder().convert(response.bodyBytes));
     } else {
       throw Exception('Erro na requisição da API!');  
@@ -20,22 +21,22 @@ class Api {
 }
 
 class BannerApi {
-  List<banners.Welcome?> getAllBanners() {
+  Future<List<banners.Welcome?>> getAllBanners() async {
     final banner = json.encode(responseJson['data']['banners']);
     return banners.welcomeBannersFromJson(banner);
   }
 }
 
 class PromoApi {
-  List<promos.Welcome?> getAllPromos() {
-      final promo = json.encode(responseJson['data']['promo']);
-      return promos.welcomePromosFromJson(promo);
+  Future<List<promos.Welcome?>> getAllPromos() async {
+    final promo = json.encode(responseJson['data']['promo']);
+    return promos.welcomePromosFromJson(promo);
   }
 }
 
 class ProductsApi {
-  List<products.Welcome?> getAllProducts() {
-      final prods = json.encode(responseJson['data']['collection_items']);
-      return products.welcomeProductsFromJson(prods);
+  Future<List<products.Welcome?>> getAllProducts() async {
+    final prods = json.encode(responseJson['data']['collection_items']);
+    return products.welcomeProductsFromJson(prods);
   }
 }
