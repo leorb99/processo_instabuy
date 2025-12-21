@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-List<Welcome> welcomeBannersFromJson(String str) => List<Welcome>.from(json.decode(str).map((x) => Welcome.fromJson(x)));
+List<Banner> bannerFromJson(String str) => List<Banner>.from(json.decode(str).map((x) => Banner.fromJson(x)));
 
-String welcomeBannersToJson(List<Welcome> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String bannerToJson(List<Banner> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class Welcome {
+class Banner {
   String? id;
   String? image;
   String? title;
@@ -14,7 +14,7 @@ class Welcome {
   Link link;
   String? href;
 
-  Welcome({
+  Banner({
     required this.id,
     required this.image,
     required this.title,
@@ -25,7 +25,7 @@ class Welcome {
     required this.href,
   });
 
-  factory Welcome.fromJson(Map<String, dynamic> json) => Welcome(
+  factory Banner.fromJson(Map<String, dynamic> json) => Banner(
     id: json["id"],
     image: json["image"],
     title: json["title"],

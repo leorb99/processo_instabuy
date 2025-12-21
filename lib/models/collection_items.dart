@@ -1,24 +1,24 @@
 import 'package:flutter_application_instabuy/models/item.dart';
 import 'dart:convert';
 
-List<Welcome> welcomeProductsFromJson(String str) => List<Welcome>.from(json.decode(str).map((x) => Welcome.fromJson(x)));
+List<CollectionItem> collectionItemFromJson(String str) => List<CollectionItem>.from(json.decode(str).map((x) => CollectionItem.fromJson(x)));
 
-String welcomeProductsToJson(List<Welcome> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String collectionItemToJson(List<CollectionItem> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class Welcome {
+class CollectionItem {
   String? id;
   String? title;
   String? slug;
   List<Item> items;
 
-  Welcome({
+  CollectionItem({
     required this.id,
     required this.title,
     required this.slug,
     required this.items,
   });
   
-  factory Welcome.fromJson(Map<String, dynamic> json) => Welcome(
+  factory CollectionItem.fromJson(Map<String, dynamic> json) => CollectionItem(
     id: json["id"],
     title: json["title"],
     slug: json["slug"],

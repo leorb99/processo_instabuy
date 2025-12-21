@@ -1,11 +1,11 @@
 import 'package:flutter_application_instabuy/models/item.dart';
 import 'dart:convert';
 
-List<Welcome> welcomePromosFromJson(String str) => List<Welcome>.from(json.decode(str).map((x) => Welcome.fromJson(x)));
+List<Promo> promoFromJson(String str) => List<Promo>.from(json.decode(str).map((x) => Promo.fromJson(x)));
 
-String welcomePromosToJson(List<Welcome> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String promoToJson(List<Promo> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class Welcome {
+class Promo {
   String? id;
   DateTime createdAt;
   String? itemType;
@@ -33,7 +33,7 @@ class Welcome {
   Shipping shipping;
   bool availableStock;
 
-  Welcome({
+  Promo({
     required this.id,
     required this.createdAt,
     required this.itemType,
@@ -62,7 +62,7 @@ class Welcome {
     required this.availableStock,
   });
 
-  factory Welcome.fromJson(Map<String, dynamic> json) => Welcome(
+  factory Promo.fromJson(Map<String, dynamic> json) => Promo(
     id: json["id"],
     createdAt: DateTime.parse(json["created_at"]),
     itemType: json["item_type"],

@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:flutter_application_instabuy/models/banners.dart' as banners;
-import 'package:flutter_application_instabuy/models/products.dart' as products;
-import 'package:flutter_application_instabuy/models/promos.dart' as promos;
+import 'package:flutter_application_instabuy/models/banners.dart';
+import 'package:flutter_application_instabuy/models/collection_items.dart';
+import 'package:flutter_application_instabuy/models/promos.dart';
 import 'package:http/http.dart' as http;
 
 var responseJson;
@@ -21,22 +21,22 @@ class Api {
 }
 
 class BannerApi {
-  Future<List<banners.Welcome?>> getAllBanners() async {
+  Future<List<Banner?>> getAllBanners() async {
     final banner = json.encode(responseJson['data']['banners']);
-    return banners.welcomeBannersFromJson(banner);
+    return bannerFromJson(banner);
   }
 }
 
 class PromoApi {
-  Future<List<promos.Welcome?>> getAllPromos() async {
+  Future<List<Promo?>> getAllPromos() async {
     final promo = json.encode(responseJson['data']['promo']);
-    return promos.welcomePromosFromJson(promo);
+    return promoFromJson(promo);
   }
 }
 
 class ProductsApi {
-  Future<List<products.Welcome?>> getAllProducts() async {
+  Future<List<CollectionItem?>> getAllCollectionItems() async {
     final prods = json.encode(responseJson['data']['collection_items']);
-    return products.welcomeProductsFromJson(prods);
+    return collectionItemFromJson(prods);
   }
 }

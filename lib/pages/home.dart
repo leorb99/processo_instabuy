@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_instabuy/models/banners.dart' as banners;
-import 'package:flutter_application_instabuy/models/products.dart' as products;
-import 'package:flutter_application_instabuy/models/promos.dart' as promos;
+import 'package:flutter_application_instabuy/models/collection_items.dart';
+import 'package:flutter_application_instabuy/models/promos.dart';
 import 'package:flutter_application_instabuy/services/api_service.dart';
-import 'package:flutter_application_instabuy/services/products_service.dart';
+import 'package:flutter_application_instabuy/services/collection_items_service.dart';
 import 'package:popover/popover.dart';
 import 'menu_items.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,9 +15,9 @@ class HomePage extends StatefulWidget {
 
 }
 class _HomePageState extends State<HomePage> {
-  List<banners.Welcome>? allBanners;
-  List<promos.Welcome>? allPromos;
-  List<products.Welcome>? allProducts;
+  List<banners.Banner>? allBanners;
+  List<Promo>? allPromos;
+  List<CollectionItem>? allProducts;
   bool isBannersLoaded = false;
   bool isPromosLoaded = false;
   bool isProductsLoaded = false;
@@ -29,27 +30,37 @@ class _HomePageState extends State<HomePage> {
     // TODO: carregar a lista de categorias e as imagens dos banners e promo
   }
   Future<void> load() async {
-    final apiService = Api();
-    await apiService.fetchData();
-    setState(() {
-      isLoaded = true;
-    });
-    final bannerApi = BannerApi();
-    final promoApi = PromoApi();
-    final productsApi = ProductsApi();
-    allBanners = (await bannerApi.getAllBanners()).cast<banners.Welcome>();
-    allPromos = (await promoApi.getAllPromos()).cast<promos.Welcome>();
-    allProducts = (await productsApi.getAllProducts()).cast<products.Welcome>();
-    setState(() {
-      isBannersLoaded = true;
-      isPromosLoaded = true;
-      isProductsLoaded = true;
-    });
+    try {
+      final apiService = Api();
+      await apiService.fetchData();
+      
+      final bannerApi = BannerApi();
+      final promoApi = PromoApi();
+      final productsApi = ProductsApi();
+
+      final results = await Future.wait([
+        bannerApi.getAllBanners(),
+        promoApi.getAllPromos(),
+        productsApi.getAllCollectionItems(),
+      ]);
+
+      setState(() {
+        allBanners = results[0].cast<banners.Banner>();
+        allPromos = results[1].cast<Promo>();
+        allProducts = results[2].cast<CollectionItem>();
+        isLoaded = true;
+        isBannersLoaded = true;
+        isPromosLoaded = true;
+        isProductsLoaded = true;
+      });
+    } catch (e) {
+      print("Erro geral no load: $e");
+    }
   }
 
-  Future<List<String>> fetchCategories() async {
+  Future<Map<String, String>> fetchCategories() async {
     final productsService = ProductsService();
-    return await productsService.listCategories();
+    return await productsService.fetchCategories(allProducts?.whereType<CollectionItem>().toList() ?? []);
   }
 
   @override
@@ -65,9 +76,19 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
-      ]),
-      
-    );
+            SizedBox(height: 20),
+            SizedBox(
+              height: 180,
+              width: double.infinity,
+              child: CachedNetworkImage(
+                imageUrl: 'https://ibassets.com.br/ib.store.banner/bnr-a5db1c129d4c4fe6b8f61ca5a5f82cb0.jpeg',
+                fit: BoxFit.cover,
+              ),
+            ),
+            
+            ],
+          ),
+        );
   }
 }
 
