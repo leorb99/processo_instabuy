@@ -1,10 +1,10 @@
 import 'api_service.dart';
 
-class Banners {
+class BannersService {
   final BannerApi _bannerApi = BannerApi();
 
-  Future<List<String?>> fetchBanners() async {
-    List<String?> images = [];
+  Future<List<String>> fetchMobileBanners() async {
+    List<String> images = [];
     try {
       final banners = await _bannerApi.getAllBanners();
       for(var b in banners) {

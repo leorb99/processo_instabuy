@@ -4,7 +4,7 @@ import 'package:flutter_application_instabuy/models/collection_items.dart';
 import 'package:flutter_application_instabuy/models/promos.dart';
 import 'package:flutter_application_instabuy/services/api_service.dart';
 import 'package:flutter_application_instabuy/services/collection_items_service.dart';
-import 'package:popover/popover.dart';
+import 'package:flutter_application_instabuy/services/banners_service.dart';
 import 'menu_items.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -27,7 +27,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     load();
-    // TODO: carregar a lista de categorias e as imagens dos banners e promo
   }
   Future<void> load() async {
     try {
@@ -63,33 +62,88 @@ class _HomePageState extends State<HomePage> {
     return await productsService.fetchCategories(allProducts?.whereType<CollectionItem>().toList() ?? []);
   }
 
+  Future<List<String>> fetchMobileBanners() async {
+    final bannersService = BannersService();
+    return await bannersService.fetchMobileBanners();
+  }
+
+  Drawer menuDrawer() {
+    return Drawer(
+      backgroundColor: Colors.deepPurple[200],
+      child: Column(  
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(top: 50, left: 20, bottom: 10),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Categorias',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),    
+            ),
+          ),
+          Expanded(
+            child: MenuItems(
+              categoriesFuture: fetchCategories(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(context),
+      drawer: menuDrawer(),
       body: Column(
         children: [
-            SizedBox(height: 15),
-            Center(
-              child: Text(
-                'Bem-vindo ao Desafio Instabuy!',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+          carouselBanner(),
+          Container(
+            height: 240,
+            width: 160,
+            decoration: BoxDecoration(
+              color: Colors.red,
+
             ),
-            SizedBox(height: 20),
-            SizedBox(
-              height: 180,
-              width: double.infinity,
-              child: CachedNetworkImage(
-                imageUrl: 'https://ibassets.com.br/ib.store.banner/bnr-a5db1c129d4c4fe6b8f61ca5a5f82cb0.jpeg',
-                fit: BoxFit.cover,
-              ),
-            ),
-            
-            ],
-          ),
-        );
+          )
+        ],
+      ),
+
+    );
   }
+
+  FutureBuilder<List<String>> carouselBanner() {
+    return FutureBuilder<List<String>>(
+      future: fetchMobileBanners(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          return SizedBox(
+            height: 170,
+            width: double.infinity,
+            child: PageView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final url = snapshot.data![index];
+                return CachedNetworkImage(
+                  imageUrl: url,
+                  fit: BoxFit.contain,
+                );
+              },
+            ),
+          );
+        } else {
+          return Text('Falha ao carregar os banners');
+        }
+      },
+    );
+  }
+
 }
 
 AppBar appBar(BuildContext context) {
@@ -97,29 +151,5 @@ AppBar appBar(BuildContext context) {
     title: Text('Desafio Instabuy', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey[200])),
     centerTitle: true,
     backgroundColor: Color(0xFF663399),
-    leading: GestureDetector(
-      onTap: () => showPopover(context: context, bodyBuilder: (context) => MenuItems(),
-        direction: PopoverDirection.right,
-        width: 150,
-        height: 100,
-        arrowHeight: 15,
-        arrowWidth: 30,
-      )
-        // Ação ao tocar no ícone de menu
-      ,
-      child: 
-      Container(
-        width: 30,
-        height: 30,
-        decoration: BoxDecoration(
-          color: Color(0xFF663399),
-        ),
-        alignment: Alignment.center,
-        child: Icon(  
-          Icons.menu,
-          color: Colors.grey[200],
-        ),
-      )
-    )
   );
 }
