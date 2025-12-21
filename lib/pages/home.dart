@@ -1,4 +1,4 @@
-import 'package:carousel_slider/carousel_slider.dart';
+// import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_instabuy/models/banners.dart' as banners;
 import 'package:flutter_application_instabuy/models/collection_items.dart';
@@ -8,7 +8,7 @@ import 'package:flutter_application_instabuy/services/banners_service.dart';
 import 'menu_items.dart';
 import 'products_page.dart';
 import 'package:flutter_application_instabuy/models/item.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+// import 'package:cached_network_image/cached_network_image.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -150,22 +150,17 @@ class _HomePageState extends State<HomePage> {
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
-          return CarouselSlider(
-            options: CarouselOptions(
-              autoPlay: true,
-              autoPlayInterval: Duration(seconds: 5),
-              autoPlayAnimationDuration: Duration(milliseconds: 800),
-              autoPlayCurve: Curves.easeInOut,
-              viewportFraction: 1.0,
-              enlargeCenterPage: false,
-              aspectRatio: 2.4
+          return SizedBox(
+            height: 165,
+            child: PageView(
+              children: snapshot.data!.map((url) {
+                return Image.network(
+                  url,
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                );
+              }).toList(),
             ),
-            items: snapshot.data!.map((url) {
-              return CachedNetworkImage(
-                imageUrl: url,
-                fit: BoxFit.contain,
-              );
-            }).toList(),
           );
         } else {
           return Text('Falha ao carregar os banners');

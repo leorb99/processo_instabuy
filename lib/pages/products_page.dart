@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+// import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_instabuy/services/item_service.dart';
 import 'package:flutter_application_instabuy/models/item.dart';
@@ -53,13 +53,15 @@ class _ProductImage extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(12),
         ),
-        child: CachedNetworkImage(
-          imageUrl: imagePath,
+        child: Image.network(
+          imagePath,
           fit: BoxFit.contain,
-          placeholder: (context, url) =>
-              const Center(child: CircularProgressIndicator()),
-          errorWidget: (context, url, error) =>
-              const Icon(Icons.error),
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
         ),
       ),
     );
