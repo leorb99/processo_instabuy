@@ -1,11 +1,13 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_instabuy/models/banners.dart' as banners;
 import 'package:flutter_application_instabuy/models/collection_items.dart';
-import 'package:flutter_application_instabuy/models/promos.dart';
 import 'package:flutter_application_instabuy/services/api_service.dart';
 import 'package:flutter_application_instabuy/services/collection_items_service.dart';
 import 'package:flutter_application_instabuy/services/banners_service.dart';
 import 'menu_items.dart';
+import 'products_page.dart';
+import 'package:flutter_application_instabuy/models/item.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,13 +18,16 @@ class HomePage extends StatefulWidget {
 }
 class _HomePageState extends State<HomePage> {
   List<banners.Banner>? allBanners;
-  List<Promo>? allPromos;
+  List<Item>? allPromos;
   List<CollectionItem>? allProducts;
+  String? selectedCategory;
+  List<Item>? visibleProducts;
   bool isBannersLoaded = false;
   bool isPromosLoaded = false;
   bool isProductsLoaded = false;
   bool isLoaded = false;
-
+  String currCategory = 'Ofertas';
+  
   @override
   void initState() {
     super.initState();
@@ -37,7 +42,7 @@ class _HomePageState extends State<HomePage> {
       final promoApi = PromoApi();
       final productsApi = ProductsApi();
 
-      final results = await Future.wait([
+      final results = ([
         bannerApi.getAllBanners(),
         promoApi.getAllPromos(),
         productsApi.getAllCollectionItems(),
@@ -45,7 +50,8 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         allBanners = results[0].cast<banners.Banner>();
-        allPromos = results[1].cast<Promo>();
+        allPromos = results[1].cast<Item>();
+        visibleProducts = results[1].cast<Item>();
         allProducts = results[2].cast<CollectionItem>();
         isLoaded = true;
         isBannersLoaded = true;
@@ -59,12 +65,17 @@ class _HomePageState extends State<HomePage> {
 
   Future<Map<String, String>> fetchCategories() async {
     final productsService = ProductsService();
-    return await productsService.fetchCategories(allProducts?.whereType<CollectionItem>().toList() ?? []);
+    return productsService.fetchCategories(allProducts?.whereType<CollectionItem>().toList() ?? []);
   }
 
   Future<List<String>> fetchMobileBanners() async {
     final bannersService = BannersService();
-    return await bannersService.fetchMobileBanners();
+    return bannersService.fetchMobileBanners();
+  }
+
+  Future<List<Item>> fetchProductsByCategory(List<CollectionItem> allProducts, String category) async {
+    final productsService = ProductsService();
+    return productsService.fetchProductsByCategory(allProducts, category);
   }
 
   Drawer menuDrawer() {
@@ -85,7 +96,14 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: MenuItems(
               categoriesFuture: fetchCategories(),
-            ),
+              onCategorySelected: (categoryId, categoryName) async {
+                setState(() {
+                  selectedCategory = categoryId;
+                });
+                visibleProducts = await fetchProductsByCategory(allProducts!, categoryId);
+                currCategory = categoryName;
+              },
+            )
           ),
         ],
       ),
@@ -97,20 +115,29 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: appBar(context),
       drawer: menuDrawer(),
-      body: Column(
-        children: [
-          carouselBanner(),
-          Container(
-            height: 240,
-            width: 160,
-            decoration: BoxDecoration(
-              color: Colors.red,
-
-            ),
-          )
-        ],
-      ),
-
+      body: SingleChildScrollView( 
+        child: Column(
+          children: [
+            carouselBanner(),
+            currCategory == 'Ofertas' ? 
+            Text(currCategory, style: TextStyle(color: Colors.red, fontSize: 36, fontWeight: FontWeight.bold)) : 
+            Text(currCategory, style: TextStyle(color: Colors.black, fontSize: 30, fontWeight: FontWeight.bold),),
+            visibleProducts != null ? GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: visibleProducts!.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.7,
+              ),
+              itemBuilder: (context, index) {
+                return ProductCard(item: visibleProducts![index], category: currCategory);
+              },
+            )
+            : const Center(child: CircularProgressIndicator()),
+          ],
+        ) 
+      )
     );
   }
 
@@ -123,19 +150,22 @@ class _HomePageState extends State<HomePage> {
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
-          return SizedBox(
-            height: 170,
-            width: double.infinity,
-            child: PageView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final url = snapshot.data![index];
-                return CachedNetworkImage(
-                  imageUrl: url,
-                  fit: BoxFit.contain,
-                );
-              },
+          return CarouselSlider(
+            options: CarouselOptions(
+              autoPlay: true,
+              autoPlayInterval: Duration(seconds: 5),
+              autoPlayAnimationDuration: Duration(milliseconds: 800),
+              autoPlayCurve: Curves.easeInOut,
+              viewportFraction: 1.0,
+              enlargeCenterPage: false,
+              aspectRatio: 2.4
             ),
+            items: snapshot.data!.map((url) {
+              return CachedNetworkImage(
+                imageUrl: url,
+                fit: BoxFit.contain,
+              );
+            }).toList(),
           );
         } else {
           return Text('Falha ao carregar os banners');
@@ -151,5 +181,23 @@ AppBar appBar(BuildContext context) {
     title: Text('Desafio Instabuy', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey[200])),
     centerTitle: true,
     backgroundColor: Color(0xFF663399),
+    actions: [
+      GestureDetector(
+        onTap: () {
+          Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const HomePage()),
+          (route) => false,
+        );
+        },
+        child: 
+          Container(
+            margin: EdgeInsets.all(10),
+            alignment: Alignment.center,
+            width: 37,
+            child: Icon(Icons.home_filled, color: Colors.black54),
+          ),
+      ),
+    ],
   );
 }

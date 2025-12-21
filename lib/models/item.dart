@@ -1,3 +1,9 @@
+import 'dart:convert';
+
+List<Item> itemFromJson(String str) => List<Item>.from(json.decode(str).map((x) => Item.fromJson(x)));
+
+String itemToJson(List<Item> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
 class Item {
   String? id;
   DateTime createdAt;
@@ -10,7 +16,7 @@ class Item {
   bool blockSale;
   String? description;
   List<String> images;
-  String? name;
+  String name;
   String? nameOnErp;
   List<CustomInfo> customInfos;
   List<Price> prices;
@@ -135,6 +141,7 @@ class Price {
   String? title;
   String? internalCode;
   double? price;
+  double? promoPrice;
   List<dynamic> barCodes;
   double? qtdStock;
 
@@ -143,6 +150,7 @@ class Price {
     required this.title,
     required this.internalCode,
     required this.price,
+    this.promoPrice,
     required this.barCodes,
     required this.qtdStock,
   });
@@ -152,6 +160,7 @@ class Price {
     title: json["title"],
     internalCode: json["internal_code"],
     price: json["price"]?.toDouble(),
+    promoPrice: json["promo_price"]?.toDouble(),
     barCodes: List<dynamic>.from(json["bar_codes"].map((x) => x)),
     qtdStock: json["qtd_stock"]?.toDouble(),
   );
@@ -161,6 +170,7 @@ class Price {
     "title": title,
     "internal_code": internalCode,
     "price": price,
+    "promo_price": promoPrice,
     "bar_codes": List<dynamic>.from(barCodes.map((x) => x)),
     "qtd_stock": qtdStock,
   };

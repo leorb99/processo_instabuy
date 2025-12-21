@@ -1,7 +1,7 @@
 import 'package:flutter_application_instabuy/models/item.dart';
 
-class Items {
-  Future<Map<String, List<String>>> fetchItemImage(Item item, String size, String prefix) async {
+class ItemsService {
+  Map<String, List<String>> fetchItemImage(Item item, String size, String prefix) {
     Map<String, List<String>> itemImages = {};
     List<String> imgs = [];
     try {

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_application_instabuy/models/banners.dart';
 import 'package:flutter_application_instabuy/models/collection_items.dart';
-import 'package:flutter_application_instabuy/models/promos.dart';
+import 'package:flutter_application_instabuy/models/item.dart';
 import 'package:http/http.dart' as http;
 
 var responseJson;
@@ -21,21 +21,21 @@ class Api {
 }
 
 class BannerApi {
-  Future<List<Banner?>> getAllBanners() async {
+  List<Banner> getAllBanners() {
     final banner = json.encode(responseJson['data']['banners']);
     return bannerFromJson(banner);
   }
 }
 
 class PromoApi {
-  Future<List<Promo?>> getAllPromos() async {
+  List<Item> getAllPromos() {
     final promo = json.encode(responseJson['data']['promo']);
-    return promoFromJson(promo);
+    return itemFromJson(promo);
   }
 }
 
 class ProductsApi {
-  Future<List<CollectionItem?>> getAllCollectionItems() async {
+  List<CollectionItem> getAllCollectionItems() {
     final prods = json.encode(responseJson['data']['collection_items']);
     return collectionItemFromJson(prods);
   }

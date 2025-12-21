@@ -3,12 +3,12 @@ import 'api_service.dart';
 class BannersService {
   final BannerApi _bannerApi = BannerApi();
 
-  Future<List<String>> fetchMobileBanners() async {
+  List<String> fetchMobileBanners() {
     List<String> images = [];
     try {
-      final banners = await _bannerApi.getAllBanners();
+      final banners = _bannerApi.getAllBanners();
       for(var b in banners) {
-        if(b != null && b.isMobile) {
+        if(b.isMobile) {
           images.add('https://ibassets.com.br/ib.store.banner/bnr-${b.image}');
         }
       }

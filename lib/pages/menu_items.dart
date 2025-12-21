@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 
 class MenuItems extends StatelessWidget {
   final Future<Map<String, String>> categoriesFuture;
+  final void Function(String categoryId, String categoryName)
+    onCategorySelected;
 
-  const MenuItems({super.key, required this.categoriesFuture});
+  const MenuItems({
+    super.key,
+    required this.categoriesFuture,
+    required this.onCategorySelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +28,8 @@ class MenuItems extends StatelessWidget {
               return ListTile(
                 title: Text(entry.value),
                 onTap: () {
-                  // TODO: navegacao entre as categorias
+                    onCategorySelected(entry.key, entry.value);
+                  Navigator.pop(context);
                 },
               );
             }).toList(),
