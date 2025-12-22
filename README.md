@@ -1,16 +1,27 @@
-# flutter_application_instabuy
+# Desafio Técnico para Vaga de Estágio em Desenvolvimento Mobile (Flutter)
 
-A new Flutter project.
+O projeto foi desenvolvido em Flutter seguindo as orientações da [especificação](https://github.com/Instabuy-Ltda/Instabuy-Selecao/blob/master/2025/mobile-flutter-dec-25.md).
 
-## Getting Started
+O aplicativo faz uso de uma API para requisitar informações sobre produtos de um Supermercado.
 
-This project is a starting point for a Flutter application.
+O projeto foi desenvolvido inteiramente sem uso de dependências externas para rodar basta:
 
-A few resources to get you started if this is your first Flutter project:
+### Clonar o repositório
+```git clone https://github.com/leorb99/processo_instabuy```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Mudar para o diretório
+```cd processo_instabuy/```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## OBS
+Recomendo que rode o projeto em um emulador de Android para garantir o funcionamento adequado.
+
+Caso já tenha configurado um emulador, pode seguir para a execução do projeto.
+
+### Liste os emuladores disponíveis
+```flutter emulators```
+
+### Escolha o emulador
+```flutter emulators --launch <DISPOSITIVO SELECIONADO>```
+
+### Execução
+```flutter run```
